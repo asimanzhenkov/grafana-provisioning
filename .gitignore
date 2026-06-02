@@ -1,0 +1,16 @@
+# Secrets and local env
+.env
+.env.*
+*.secret
+
+# Grafana local runtime
+grafana.db
+data/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node
+node_modules/

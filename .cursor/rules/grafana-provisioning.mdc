@@ -1,0 +1,31 @@
+---
+description: Rules for working with Grafana provisioning repository
+globs: ["provisioning/**/*.yaml", "provisioning/**/*.json", "skills/**/*.md"]
+alwaysApply: true
+---
+
+# Grafana Provisioning Repository Rules
+
+## General
+- All dashboards are provisioned via JSON files in `provisioning/dashboards/`
+- All datasources are provisioned via YAML in `provisioning/datasources/`
+- All alerting rules are in `provisioning/alerting/rules/`
+- Never commit secrets or API keys — use `${ENV_VAR}` syntax
+- Dashboard UIDs must be stable and explicit (never null or auto-generated)
+- Set `"editable": false` in all dashboard JSONs — changes via Git only
+
+## Skills — Load based on your task
+- Business requirements → `skills/business-analyst/SKILL.md`
+- Architecture design  → `skills/system-analyst/SKILL.md`
+- SLO/SLI/Alerting     → `skills/sre-engineer/SKILL.md`
+- PromQL queries        → `skills/prometheus-querying/SKILL.md`
+- Dashboard JSON        → `skills/dashboard-developer/SKILL.md`
+- Visual design         → `skills/dashboard-designer/SKILL.md`
+- Alert rules           → `skills/alerting-engineer/SKILL.md`
+- Datasource configs    → `skills/datasource-engineer/SKILL.md`
+
+## Conventions
+- Dashboard tags: `["team:{team}", "tier:{l0|l1|l2|l3}", "domain:{domain}"]`
+- Datasource UIDs: `{type}-{env}-{region}` e.g. `prometheus-prod-eu-west`
+- Alert UIDs: `{service}-{alertname}` e.g. `payment-api-high-error-rate`
+- Runbook URLs must be set for every alert rule
