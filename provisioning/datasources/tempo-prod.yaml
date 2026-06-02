@@ -1,0 +1,16 @@
+apiVersion: 1
+datasources:
+  - name: "Tempo (prod)"
+    type: tempo
+    uid: tempo-prod-main
+    url: "${TEMPO_PROD_URL}"
+    access: proxy
+    jsonData:
+      serviceMap:
+        datasourceUid: prometheus-prod-main
+      tracesToLogs:
+        datasourceUid: loki-prod-main
+        filterByTraceID: true
+        tags: ["job", "namespace"]
+      nodeGraph:
+        enabled: true

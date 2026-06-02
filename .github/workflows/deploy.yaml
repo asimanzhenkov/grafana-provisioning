@@ -1,0 +1,31 @@
+name: Deploy to Grafana
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'provisioning/**'
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Staging
+        env:
+          GRAFANA_URL: ${{ vars.GRAFANA_STAGING_URL }}
+          GRAFANA_API_KEY: ${{ secrets.GRAFANA_STAGING_API_KEY }}
+        run: ./scripts/deploy.sh
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: deploy-staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Production
+        env:
+          GRAFANA_URL: ${{ vars.GRAFANA_PROD_URL }}
+          GRAFANA_API_KEY: ${{ secrets.GRAFANA_PROD_API_KEY }}
+        run: ./scripts/deploy.sh

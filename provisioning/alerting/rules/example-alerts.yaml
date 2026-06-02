@@ -1,0 +1,39 @@
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: example-service-alerts
+    folder: Platform Alerts
+    interval: 1m
+    rules:
+      - uid: example-high-error-rate
+        title: "ExampleService HighErrorRate"
+        condition: threshold
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus-prod-main
+            model:
+              expr: |
+                sum(rate(http_requests_total{job="example-service",status=~"5.."}[5m]))
+                /
+                sum(rate(http_requests_total{job="example-service"}[5m]))
+              instant: true
+          - refId: threshold
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              conditions:
+                - evaluator: { type: gt, params: [0.01] }
+                  operator:  { type: and }
+                  query:     { params: [A] }
+                  reducer:   { type: last }
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: "Высокий error rate на example-service"
+          description: "Error rate: {{ $value | humanizePercentage }}"
+          runbook_url: "https://wiki/runbooks/high-error-rate"
+        labels:
+          severity: critical
+          team: platform

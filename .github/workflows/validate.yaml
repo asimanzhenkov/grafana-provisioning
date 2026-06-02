@@ -1,0 +1,39 @@
+name: Validate Grafana Provisioning
+
+on:
+  pull_request:
+    paths:
+      - 'provisioning/**'
+      - 'skills/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON dashboards
+        run: |
+          find provisioning/dashboards -name "*.json" 2>/dev/null | while read f; do
+            echo "Validating $f..."
+            python3 -c "import json,sys; json.load(open('$f'))" || exit 1
+            uid=$(python3 -c "import json; d=json.load(open('$f')); print(d.get('uid',''))")
+            [ -z "$uid" ] && echo "ERROR: Missing uid in $f" && exit 1
+            echo "  uid: $uid OK"
+          done
+
+      - name: Validate YAML files
+        run: |
+          pip install pyyaml -q
+          find provisioning -name "*.yaml" | while read f; do
+            echo "Validating $f..."
+            python3 -c "import yaml; list(yaml.safe_load_all(open('$f')))" || exit 1
+          done
+
+      - name: Check for hardcoded secrets
+        run: |
+          if grep -rE "(password|secret|token|key)\s*:\s*['\"]?[^$\${\\s'\"][^'\"]{8}" provisioning/ 2>/dev/null; then
+            echo "ERROR: Possible hardcoded secret detected!"
+            exit 1
+          fi
+          echo "No hardcoded secrets found."

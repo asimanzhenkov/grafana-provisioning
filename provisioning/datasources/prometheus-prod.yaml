@@ -1,0 +1,15 @@
+apiVersion: 1
+datasources:
+  - name: "Prometheus (prod)"
+    type: prometheus
+    uid: prometheus-prod-main
+    url: "${PROMETHEUS_PROD_URL}"
+    access: proxy
+    isDefault: true
+    jsonData:
+      timeInterval: "15s"
+      httpMethod: POST
+      incrementalQuerying: true
+      exemplarTraceIdDestinations:
+        - name: traceID
+          datasourceUid: tempo-prod-main
